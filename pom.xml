@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt-shapefile</artifactId>
+  <artifactId>gt-shapefile-vng</artifactId>
   <packaging>jar</packaging>
   <name>Shapefile module</name>
   
