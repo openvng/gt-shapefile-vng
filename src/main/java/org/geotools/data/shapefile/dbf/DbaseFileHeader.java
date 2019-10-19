@@ -880,6 +880,7 @@ public class DbaseFileHeader {
     
                 // write the decimal count.
                 buffer.put((byte) fields[i].decimalCount);
+                //System.out.println(fields[i].fieldName + ": " + ((byte) fields[i].decimalCount));
     
                 // write the reserved bytes.
                 // for (in j=0; jj<14; j++) out.writeByteLE(0);

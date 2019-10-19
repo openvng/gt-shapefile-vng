@@ -560,6 +560,12 @@ class ShapefileFeatureSource extends ContentFeatureSource {
                     }
                     usedNames.add(name);
                     int length = header.getFieldLength(i);
+                    int scale = header.getFieldDecimalCount(i);
+                    if (scale != 0) {
+                      length --; // exclude dot
+                    }
+                    build.addUserData("kr.vng.length", length);
+                    build.addUserData("kr.vng.scale", scale);
 
                     build.setNillable(true);
                     build.setLength(length);

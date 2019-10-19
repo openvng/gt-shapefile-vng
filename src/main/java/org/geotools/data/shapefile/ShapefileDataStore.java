@@ -363,6 +363,7 @@ public class ShapefileDataStore extends ContentDataStore implements FileDataStor
 
         for (int i = 0, ii = featureType.getAttributeCount(); i < ii; i++) {
             AttributeDescriptor type = featureType.getDescriptor(i);
+            Integer scale = (Integer) type.getUserData().get("kr.vng.scale");
 
             Class<?> colType = type.getType().getBinding();
             String colName = type.getLocalName();
@@ -371,14 +372,21 @@ public class ShapefileDataStore extends ContentDataStore implements FileDataStor
             if (fieldLen == FeatureTypes.ANY_LENGTH)
                 fieldLen = 255;
             if ((colType == Integer.class) || (colType == Short.class) || (colType == Byte.class)) {
-                header.addColumn(colName, 'N', Math.min(fieldLen, 9), 0);
+                header.addColumn(colName, 'N', Math.min(fieldLen, 33), 0); // 9
             } else if (colType == Long.class) {
-                header.addColumn(colName, 'N', Math.min(fieldLen, 19), 0);
+                header.addColumn(colName, 'N', Math.min(fieldLen, 33), 0); // 19
             } else if (colType == BigInteger.class) {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 33), 0);
             } else if (Number.class.isAssignableFrom(colType)) {
                 int l = Math.min(fieldLen, 33);
                 int d = Math.max(l - 2, 0);
+                if (scale != null) {
+                  d = scale.intValue();
+                }
+                if (d != 0) { // include dot!
+                  l = Math.min(fieldLen+1, 33);
+                }
+                
                 header.addColumn(colName, 'N', l, d);
                 // This check has to come before the Date one or it is never reached
                 // also, this field is only activated with the following system property:
