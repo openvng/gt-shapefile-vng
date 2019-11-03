@@ -27,6 +27,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -363,8 +366,27 @@ public class DbaseFileWriter {
             
             this.swallowFieldSizeErrors = swallowFieldSizeErrors;
         }
-
+        
         public String getFieldString(int size, String s) {
+            try {
+              if (s != null) {
+                CharsetDecoder cd = this.charset.newDecoder();
+                byte[] sba = s.getBytes(this.charset.name());
+                ByteBuffer bb = ByteBuffer.wrap(sba, 0, sba.length < size ? sba.length : size);
+                CharBuffer cb = CharBuffer.allocate(size);
+                cd.onMalformedInput(CodingErrorAction.IGNORE);
+                cd.decode(bb, cb, true);
+                cd.flush(cb);
+                return getFieldString2(size, new String(cb.array(), 0, cb.position()));
+              } else {
+                return getFieldString2(size, s);
+              }
+            } catch(UnsupportedEncodingException e) {
+                throw new RuntimeException("This error should never occurr", e);
+            }
+        }
+
+        public String getFieldString2(int size, String s) {
             try {
                 buffer.replace(0, size, emptyString);
                 buffer.setLength(size);
